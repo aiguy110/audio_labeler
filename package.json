@@ -1,0 +1,15 @@
+{
+  "name": "audio_labeler",
+  "version": "1.0.0",
+  "description": "Help label audio files for ML purposes",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Josiah Hunsinger",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.0"
+  }
+}

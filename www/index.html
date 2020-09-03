@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Audio Labeler</h1>
+    
+    <form action='/upload' method='POST' enctype="multipart/form-data" target="redirect-absorber">
+        <p>Select an audio file to label</p>
+        <input type="file" id="file-selector" name="audioUpload"/>
+        <input type="submit" id="upload-button" disabled="true" value="Upload"/>
+    </form>
+    <iframe style="display:none" name="redirect-absorber"></iframe>
+
+    <script src="/index.js"></script>
+</body>
+</html>
