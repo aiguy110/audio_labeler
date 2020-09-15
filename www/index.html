@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html>
-<body>
-    <h1>Audio Labeler</h1>
-    
-    <form action='/upload' method='POST' enctype="multipart/form-data" target="redirect-absorber">
-        <p>Select an audio file to label</p>
-        <input type="file" id="file-selector" name="audioUpload"/>
-        <input type="submit" id="upload-button" disabled="true" value="Upload"/>
-    </form>
-    <iframe style="display:none" name="redirect-absorber"></iframe>
+<head>        
+    <link rel="stylesheet" href="/index.css"></style>
+</head>
+<body class="page">
+    <div class="tabloid">
+        <div class="side-by-side">
+            <h1>Audio Labeler</h1>
+            <form action='/upload' method='POST' enctype="multipart/form-data" target="redirect-absorber">
+                <p>Select an audio file to label</p>
+                <input type="file" id="file-selector" name="audioUpload"/>
+                <input type="submit" id="upload-button" disabled="true" value="Upload"/>
+            </form>
+            <iframe style="display:none" name="redirect-absorber"></iframe>
+            
+            <audio id="audio" src="/samples/uploadedAudio.mp3"></audio>
+        </div>
+
+        <div class="side-by-side">
+            <textarea class="data-box"></textarea>
+        </div>
+    </div>
+
+    <div class="player">
+        <input type="range" min="1" max="1000000" class="full-width">
+        <canvas id="label-bar" class="full-width" style="height: 25px;"></canvas>
+    </div>
 
     <script src="/index.js"></script>
 </body>

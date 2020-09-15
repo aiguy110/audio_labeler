@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/upload', (req, res) => {
-    req.files.audioUpload.mv('www/samples/uploadedAudio.mp3')
+    req.files.audioUpload.mv(`www/samples/uploadedAudio.mp3`)
     res.send('Success')
 })
 

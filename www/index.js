@@ -20,3 +20,13 @@ document.getElementById('upload-button').onsubmit = (e) => {
     e.preventDefault()
     return false;
 }
+
+labelBar = document.getElementById('label-bar')
+ctx = labelBar.getContext("2d")
+
+function drawLabelBar(){
+    // Draw grey background
+    ctx.fillStyle = "#aaaaaa"
+    ctx.fillRect(0, 0, labelBar.width, 50)
+} 
+drawLabelBar()
