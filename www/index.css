@@ -14,6 +14,7 @@
 
 .side-by-side {
     flex-grow: 1;
+    margin: 20px;
 }
 
 .data-box {
@@ -21,10 +22,19 @@
     height: 95%;
 }
 
+.danger {
+    background-color: #ff7777;
+}
+
+.warning {
+    background-color: #ffff77;
+}
+
 .player {
-    width: 100%;
+    width: 95%;
     display: block;
     bottom: 0;
+    margin: 20px;
 }
 
 .full-width {

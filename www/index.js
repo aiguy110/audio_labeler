@@ -1,10 +1,14 @@
 const labelBar = document.getElementById('label-bar')
 const ctx = labelBar.getContext("2d")
 
-const audioSlider = document.getElementById('audio-slider')
 const dataBox = document.getElementById('data-box')
+var labelData = [{"time": "0:00.0", "label": "none", "color": "#aaaaaa"}]
+const errorText = document.getElementById('error-text')
 
+const audioSlider = document.getElementById('audio-slider')
 const audioElement = document.getElementById('audio')
+
+const labelSelector = document.getElementById('label-selector')
 
 
 
@@ -33,13 +37,28 @@ audioSlider.onchange = () => { // Only triggers on user induced change
 
 dataBox.oninput = () => {
     try {
-        JSON.parse(dataBox.value)
-    } catch{
+        labelData = JSON.parse(dataBox.value)
+    } catch(err) {
+        dataBox.classList.remove("warning")
+        dataBox.classList.add("danger")
+        errorText.innerHTML = err.message
         return
     }
-    
-    drawLabelBar()
+    dataBox.classList.remove("danger")
+
+    try {
+        formatLabelData()
+        drawLabelBar()
+    } catch(err) {
+        dataBox.classList.add("warning")
+        errorText.innerHTML = err.message
+        return
+    }
+    dataBox.classList.remove("warning")
+    errorText.innerHTML = ""
 }
+
+
 
 document.onkeydown = (e) => {
     if (document.activeElement == dataBox){
@@ -74,15 +93,21 @@ function timeStrToSeconds(timeStr){
         seconds += 3600 * secMinHours[2]
     }
 
+    console.log('returning seconds value', seconds)
     return seconds
 }
 
 function secondsToRatio(seconds){
+    console.log(seconds, audioElement.duration, seconds / audioElement.duration)
     return seconds / audioElement.duration
 }
 
 function ratioToSeconds(ratio){
     return ratio * audioElement.duration
+}
+
+function formatLabelData() {
+    dataBox.value = JSON.stringify(labelData, null, 4)
 }
 
 function drawLabelBar(){
@@ -95,9 +120,34 @@ function drawLabelBar(){
     
     for (let i in labelData) {
         label = labelData[i]
-        startX = secondsToRatio(timeStrToSeconds(label["time"])) * labelBar.width
-        console.log(startX)
+        // Validate
+        if (!label.hasOwnProperty("time")){
+            throw {message: 'No "time" attribute in label object'}
+        }
+        if (!label.hasOwnProperty("label")){
+            throw {message: 'No "label" attribute in label object'}
+        }
+        if (!label.hasOwnProperty("color")){
+            throw {message: 'No "color" attribute in label object'}
+        }
+
+        try{
+            seconds = timeStrToSeconds(label["time"])
+            console.log('seconds', seconds)
+            if (seconds.isNaN())
+            {
+                console.log('throwing up')
+                throw "Fuck no"
+            }
+            startX = secondsToRatio(seconds) * labelBar.width
+        } catch {
+            throw {message: 'Error parsing "time" attribute'}
+        }
+
         ctx.fillStyle = label["color"]
         ctx.fillRect(startX, 0, labelBar.width-startX, 50)
     }
 } 
+
+formatLabelData()
+drawLabelBar()
