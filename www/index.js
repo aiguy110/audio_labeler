@@ -140,7 +140,6 @@ function formatLabelData() {
 
 function cleanLabelData(){
     // Make sure times are in order
-    //console.log('Cleaning labeData. Pre-clean:', labelData)
     labelData = labelData.sort( (labelObj1, labelObj2) => {
         return timeStrToSeconds(labelObj1["time"]) - timeStrToSeconds(labelObj2["time"])
     })
@@ -158,7 +157,22 @@ function cleanLabelData(){
             }
         }
     }
-    //console.log('Post-clean:', labelData)
+
+    // Remove repeates
+    indsToRemove = []
+    lastLabel = ''
+    for (let i in labelData) {
+        if (labelData[i]["label"] == lastLabel){
+            indsToRemove.push(i)
+        }
+        lastLabel = labelData[i]["label"]
+    }
+
+    indsToRemove = indsToRemove.reverse()
+    for (let j in indsToRemove){
+        i = indsToRemove[j]
+        labelData.splice(i, 1)
+    }
 }
 
 function updatePickList(){
