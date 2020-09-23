@@ -9,6 +9,7 @@ const audioSlider = document.getElementById('audio-slider')
 const audioElement = document.getElementById('audio')
 
 const labelSelector = document.getElementById('label-selector')
+const markButton = document.getElementById('mark-button')
 
 
 
@@ -35,7 +36,17 @@ audioSlider.onchange = () => { // Only triggers on user induced change
     audioElement.currentTime = ratioToSeconds( audioSlider.value / audioSlider.max )
 }
 
-dataBox.oninput = () => {
+markButton.onclick = () => {
+    labelData.push({
+        "time": secondsToTimeStr(audioElement.currentTime),
+        "label": labelSelector.value
+    })
+
+    formatLabelData()
+    processLabelUpdate()
+}
+
+function processLabelUpdate(){
     try {
         labelData = JSON.parse(dataBox.value)
     } catch(err) {
@@ -47,8 +58,10 @@ dataBox.oninput = () => {
     dataBox.classList.remove("danger")
 
     try {
+        cleanLabelData()
         formatLabelData()
         drawLabelBar()
+        updatePickList()
     } catch(err) {
         dataBox.classList.add("warning")
         errorText.innerHTML = err.message
@@ -56,8 +69,11 @@ dataBox.oninput = () => {
     }
     dataBox.classList.remove("warning")
     errorText.innerHTML = ""
+
+    cleanLabelData()
 }
 
+dataBox.oninput = processLabelUpdate
 
 
 document.onkeydown = (e) => {
@@ -93,12 +109,24 @@ function timeStrToSeconds(timeStr){
         seconds += 3600 * secMinHours[2]
     }
 
-    console.log('returning seconds value', seconds)
     return seconds
 }
 
+function secondsToTimeStr(seconds){
+    h = Math.floor(seconds/3600)
+    m = Math.floor((seconds - h*3600)/60)
+    s = seconds - h*3600 - m*60
+
+    function pad(num, size) {
+        var s = num+"";
+        while (s.split('.')[0].length < size) s = "0" + s;
+        return s;
+    }
+
+    return (h > 0) ? `${h}:${pad(m,2)}:${pad(s,2)}` : `${m}:${pad(s,2)}` 
+}
+
 function secondsToRatio(seconds){
-    console.log(seconds, audioElement.duration, seconds / audioElement.duration)
     return seconds / audioElement.duration
 }
 
@@ -108,6 +136,43 @@ function ratioToSeconds(ratio){
 
 function formatLabelData() {
     dataBox.value = JSON.stringify(labelData, null, 4)
+}
+
+function cleanLabelData(){
+    // Make sure times are in order
+    //console.log('Cleaning labeData. Pre-clean:', labelData)
+    labelData = labelData.sort( (labelObj1, labelObj2) => {
+        return timeStrToSeconds(labelObj1["time"]) - timeStrToSeconds(labelObj2["time"])
+    })
+
+    // If there is a labelObj with a label string but no color, try to populate the color
+    for (let i in labelData) {
+        labelObj = labelData[i]
+        if (!labelObj.hasOwnProperty("color")){
+            for (let j in labelData) {
+                maybeColorProvider = labelData[j]
+                if (maybeColorProvider.hasOwnProperty("color") && maybeColorProvider["label"]==labelObj["label"]){
+                    labelObj["color"] = maybeColorProvider["color"]
+                    break
+                }
+            }
+        }
+    }
+    //console.log('Post-clean:', labelData)
+}
+
+function updatePickList(){
+    labels = []
+    optionsStr = ''
+    for (let i in labelData){
+        if (labels.indexOf(labelData[i]["label"]) == -1){
+            labelStr = labelData[i]["label"]
+            labels.push(labelStr)
+            optionsStr += `<option value="${labelStr}">${labelStr}</option>`
+        }
+    }
+    
+    labelSelector.innerHTML = optionsStr
 }
 
 function drawLabelBar(){
@@ -133,10 +198,8 @@ function drawLabelBar(){
 
         try{
             seconds = timeStrToSeconds(label["time"])
-            console.log('seconds', seconds)
-            if (seconds.isNaN())
+            if (isNaN(seconds))
             {
-                console.log('throwing up')
                 throw "Fuck no"
             }
             startX = secondsToRatio(seconds) * labelBar.width
@@ -151,3 +214,4 @@ function drawLabelBar(){
 
 formatLabelData()
 drawLabelBar()
+processLabelUpdate()

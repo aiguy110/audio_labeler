@@ -40,3 +40,7 @@
 .full-width {
     width: 100%;
 }
+
+.error-text {
+    width: 30vw;
+}
